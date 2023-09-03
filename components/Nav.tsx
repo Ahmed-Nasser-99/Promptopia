@@ -18,6 +18,7 @@ const Nav = () => {
     LiteralUnion<BuiltInProviderType, string>,
     ClientSafeProvider
   > | null>(null);
+  const [toggleDropdown, setToggleDropdown] = useState(false);
 
   useEffect(() => {
     const fetchProviders = async () => {
@@ -53,6 +54,7 @@ const Nav = () => {
             {
               <Link href="/profile">
                 <Image
+                  className="full-rounded"
                   src="./assets/images/logo.svg"
                   alt="profile"
                   width={30}
@@ -62,22 +64,78 @@ const Nav = () => {
             }
           </div>
         ) : (
+          <RenderProviders providers={providers} />
+        )}
+      </div>
+
+      {/* Mobile Nav */}
+      <div className="sm:hidden flex relative">
+        {isUserLoggedIn ? (
           <>
-            {providers &&
-              Object.values(providers).map((provider) => (
-                <button
-                  key={provider.name}
-                  onClick={() => signIn(provider.id)}
-                  className="black_btn"
+            <Image
+              className="full-rounded"
+              src="./assets/images/logo.svg"
+              alt="profile"
+              width={30}
+              height={30}
+              onClick={() => setToggleDropdown((prev) => !prev)}
+            />
+            {toggleDropdown && (
+              <div className="dropdown">
+                <Link
+                  className="dropdown_link"
+                  href="/create-prompt"
+                  onClick={() => setToggleDropdown(false)}
                 >
-                  Sign in
+                  Create Prompt
+                </Link>
+                <Link
+                  className="dropdown_link"
+                  href="/profile"
+                  onClick={() => setToggleDropdown(false)}
+                >
+                  Profile
+                </Link>
+                <div className="w-full h-px bg-gray-300 my-1" />
+                <button
+                  className="black_btn w-full"
+                  onClick={() => {
+                    setToggleDropdown(false);
+                    signOut();
+                  }}
+                >
+                  Sign out
                 </button>
-              ))}
+              </div>
+            )}
           </>
+        ) : (
+          <RenderProviders providers={providers} />
         )}
       </div>
     </nav>
   );
+};
+
+interface RenderProvidersProps {
+  providers: Record<
+    LiteralUnion<BuiltInProviderType, string>,
+    ClientSafeProvider
+  > | null;
+}
+
+const RenderProviders = ({ providers }: RenderProvidersProps) => {
+  if (providers) {
+    return Object.values(providers).map((provider) => (
+      <button
+        key={provider.name}
+        onClick={() => signIn(provider.id)}
+        className="black_btn"
+      >
+        Sign in
+      </button>
+    ));
+  }
 };
 
 export default Nav;
