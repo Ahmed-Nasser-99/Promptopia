@@ -14,14 +14,6 @@ const userSchema = new Schema({
       "Username invalid, it should contain 8-20 alphanumeric letters and be unique!",
     ],
   },
-  password: {
-    type: String,
-    required: [true, "Please provide a password"],
-    match: [
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,20})/,
-      "Password invalid, it should contain 8-20 characters, at least one uppercase letter, one lowercase letter, one number and one special character!",
-    ],
-  },
   image: {
     type: String,
   },
