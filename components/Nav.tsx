@@ -7,13 +7,14 @@ import {
   ClientSafeProvider,
   LiteralUnion,
   signIn,
+  useSession,
 } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const Nav = () => {
-  const isUserLoggedIn = true;
+  const { data: session, status } = useSession();
   const [providers, setProviders] = useState<Record<
     LiteralUnion<BuiltInProviderType, string>,
     ClientSafeProvider
@@ -43,7 +44,7 @@ const Nav = () => {
 
       {/* Desktop Nav */}
       <div className="sm:flex hidden ">
-        {isUserLoggedIn ? (
+        {session?.user ? (
           <div className="flex gap-4 items-center">
             <Link href="/create-prompt">
               <button className="black_btn">Create Prompt</button>
@@ -54,30 +55,30 @@ const Nav = () => {
             {
               <Link href="/profile">
                 <Image
-                  className="full-rounded"
-                  src="./assets/images/logo.svg"
+                  className="rounded-full"
+                  src={session?.user?.image as string}
                   alt="profile"
-                  width={30}
-                  height={30}
+                  width={40}
+                  height={40}
                 />
               </Link>
             }
           </div>
         ) : (
-          <RenderProviders providers={providers} />
+          <RenderProviders providers={providers} status={status} />
         )}
       </div>
 
       {/* Mobile Nav */}
       <div className="sm:hidden flex relative">
-        {isUserLoggedIn ? (
+        {session?.user ? (
           <>
             <Image
-              className="full-rounded"
-              src="./assets/images/logo.svg"
+              className="rounded-full"
+              src={session?.user?.image as string}
               alt="profile"
-              width={30}
-              height={30}
+              width={40}
+              height={40}
               onClick={() => setToggleDropdown((prev) => !prev)}
             />
             {toggleDropdown && (
@@ -110,7 +111,7 @@ const Nav = () => {
             )}
           </>
         ) : (
-          <RenderProviders providers={providers} />
+          <RenderProviders providers={providers} status={status} />
         )}
       </div>
     </nav>
@@ -122,9 +123,13 @@ interface RenderProvidersProps {
     LiteralUnion<BuiltInProviderType, string>,
     ClientSafeProvider
   > | null;
+  status: "authenticated" | "loading" | "unauthenticated";
 }
 
-const RenderProviders = ({ providers }: RenderProvidersProps) => {
+const RenderProviders = ({ providers, status }: RenderProvidersProps) => {
+  if (status === "loading") {
+    return <p>Loading...</p>;
+  }
   if (providers) {
     return Object.values(providers).map((provider) => (
       <button
