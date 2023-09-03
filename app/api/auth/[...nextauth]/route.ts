@@ -1,6 +1,5 @@
 import User from "@models/user";
 import { connectToDB } from "@utils/database";
-import { SessionOptions } from "next-auth";
 import NextAuth from "next-auth/next";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -36,7 +35,7 @@ const handler = NextAuth({
         }
         return true;
       } catch (error) {
-        console.log(error);
+        console.log("Auth Error", error);
         return false;
       }
     },
